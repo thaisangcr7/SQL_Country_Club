@@ -52,13 +52,23 @@ WHERE membercost < 0.2 * monthlymaintencance;
 
 /* Q4: Write an SQL query to retrieve the details of facilities with ID 1 and 5.
 Try writing the query without using the OR operator. */
+SELECT *
+FROM 'Facilities'
+WHERE Facid =1
+OR Facid =5;
+
 
 
 /* Q5: Produce a list of facilities, with each labelled as
 'cheap' or 'expensive', depending on if their monthly maintenance cost is
 more than $100. Return the name and monthly maintenance of the facilities
 in question. */
-
+SELECT name, monthlymaintenance,
+CASE WHEN monthlymaintenance >100
+THEN 'expensive'
+ELSE 'cheap'
+END AS 'cost'
+FROM Facilities;
 
 /* Q6: You'd like to get the first and last name of the last member(s)
 who signed up. Try not to use the LIMIT clause for your solution. */
