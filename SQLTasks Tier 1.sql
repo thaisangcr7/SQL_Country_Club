@@ -72,13 +72,23 @@ FROM Facilities;
 
 /* Q6: You'd like to get the first and last name of the last member(s)
 who signed up. Try not to use the LIMIT clause for your solution. */
-
+SELECT surname, firstname, joindate
+FROM `Members`
+WHERE LAST_DAY(joindate);
 
 /* Q7: Produce a list of all members who have used a tennis court.
 Include in your output the name of the court, and the name of the member
 formatted as a single column. Ensure no duplicate data, and order by
 the member name. */
-
+SELECT bf.facid, m.surname, m.firstname, bf.name
+FROM ( SELECT DISTINCT b.facid, b.memid, f.name 
+      FROM Bookings as b 
+      LEFT JOIN Facilities AS f ON b.facid = f.facid
+      WHERE b.facid = 0
+      OR b.facid =1)
+      AS bf 
+      LEFT JOIN Members AS m on bf.memid = m.memid
+      ORDER BY m.surname, m.firstname;
 
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
 will cost the member (or guest) more than $30. Remember that guests have
@@ -86,9 +96,29 @@ different costs to members (the listed costs are per half-hour 'slot'), and
 the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
-
+SELECT b.facid, b.starttime, f.membercost, f.guestcost, f.name, m.surname, m.firstname
+FROM Bookings AS b
+LEFT JOIN Facilities AS f ON b.facid = f.facid
+LEFT JOIN Members AS m ON b.memid = m.memid
+WHERE b.starttime LIKE '2012-09-14%'
+AND (f.membercost >=30 OR f.guestcost >=0)
+ORDER BY f.guestcost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
+SELECT bf.facid, bf.memid, bf.starttime, bf.membercost, bf.guestcost, bf.name, m.surname, m.firstname
+FROM (
+
+SELECT b.facid, b.memid, b.starttime, f.membercost, f.guestcost, f.name
+FROM Bookings AS b
+LEFT JOIN Facilities AS f ON b.facid = f.facid
+WHERE b.starttime LIKE '2012-09-14%'
+AND (
+f.membercost >=30
+OR f.guestcost >=30
+)
+) AS bf
+LEFT JOIN Members AS m ON bf.memid = m.memid
+ORDER BY bf.guestcost DESC;
 
 
 /* PART 2: SQLite
